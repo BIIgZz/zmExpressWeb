@@ -42,9 +42,10 @@ import LoginSelectTenant from './LoginSelectTenant'
 import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
 import { getEncryptedString } from '@/utils/encryption/aesEncrypt'
 import { timeFix } from '@/utils/util'
-
+import { addUser,editUser,queryUserRole,queryall } from '@/api/api'
 import LoginAccount from './LoginAccount'
 import LoginPhone from './LoginPhone'
+import {mapGetters} from 'vuex'
 
 export default {
     components: {
@@ -65,6 +66,7 @@ export default {
           key:"",
           iv:"",
         },
+        role:"",
       }
     },
     created() {
@@ -73,6 +75,7 @@ export default {
       this.rememberMe = true
     },
     methods:{
+      ...mapGetters(["nickname", "avatar","userInfo","userIdentity"]),
       handleTabClick(key){
         this.customActiveKey = key
       },
@@ -126,25 +129,50 @@ export default {
         this.loginSuccess()
       },
       //登录成功
+
       loginSuccess () {
-        this.$router.push({ path: "/dashboard/analysis" }).catch(()=>{
-          console.log('登录跳转首页出错,这个错误从哪里来的')
-        })
+        this.getUserRoles(this.userInfo().id);
+
+        if (this.userInfo().userIdentity==null){
+          this.$router.push({ path: "/src/views/zm/user/settings/Index" }).catch(()=>{
+            console.log('登录跳转首页出错,这个错误从哪里来的')
+          })
+        }else{
+          // console.log("role",this.role)
+          // if (this.role=='1485848421664718850'){
+          //   console.log(this.role,"role");
+          //   this.$router.push({ path: "/src/views/zm/user/Index" }).catch(()=>{
+          //     console.log('登录跳转首页出错,这个错误从哪里来的')
+          //   })
+          // }else{
+            this.$router.push({ path: "/dashboard/analysis" }).catch(()=>{
+              console.log('登录跳转员工首页出错,这个错误从哪里来的')
+            })
+          // }
+        }
         this.$notification.success({
           message: '欢迎',
           description: `${timeFix()}，欢迎回来`,
         });
       },
-
+      getUserRoles(userid){
+        queryUserRole({userid:userid}).then((res)=>{
+          if(res.success){
+            this.role = res.result[0];
+          }
+        });
+      },
       stepCaptchaSuccess () {
         this.loginSuccess()
       },
       stepCaptchaCancel () {
+
         this.Logout().then(() => {
           this.loginBtn = false
           this.stepCaptchaVisible = false
         })
       },
+
       //获取密码加密规则
       getEncrypte(){
         var encryptedString = Vue.ls.get(ENCRYPTED_STRING);
@@ -204,6 +232,11 @@ export default {
     .register {
         float: right;
       }
+    .main {
+      min-width: 260px;
+      width: 368px;
+      margin: 0 auto;
+    }
     }
   }
 </style>

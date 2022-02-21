@@ -21,7 +21,7 @@
     props: {
       title: {
         type: String,
-        default: 'Jeecg-Boot Pro',
+        default: '中盟管理平台',
         required: false
       },
       showTitle: {

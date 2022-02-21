@@ -6,12 +6,12 @@
         <a-row :gutter="24">
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <a-form-item label="国家">
-              <a-input placeholder="请输入国家" v-model="queryParam.country"></a-input>
+              <j-search-select-tag placeholder="请选择国家" v-model="queryParam.country" dict="zm_tool_countries,cname,cname"/>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <a-form-item label="收货区域">
-              <a-input placeholder="请输入收货区域" v-model="queryParam.stationArea"></a-input>
+              <j-search-select-tag placeholder="请选择收货区域" v-model="queryParam.stationArea" dict="zm_area_receiving,area_name,area_name"/>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -67,6 +67,8 @@
         class="j-table-force-nowrap"
         @change="handleTableChange">
 
+        /** 超链接*/
+        <a slot="httpUrl"  slot-scope='text'>{{text}}</a>
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
         </template>
@@ -143,6 +145,18 @@
             }
           },
           {
+            title:'站点名称',
+            align:"center",
+            dataIndex: 'cnName',
+            scopedSlots: {customRender: 'httpUrl'},
+            customCell:this.cellClick
+          },
+          {
+            title:'收货区域',
+            align:"center",
+            dataIndex: 'stationArea_dictText'
+          },
+          {
             title:'负责人',
             align:"center",
             dataIndex: 'leader'
@@ -152,16 +166,7 @@
             align:"center",
             dataIndex: 'stationStatus_dictText'
           },
-          {
-            title:'收货区域',
-            align:"center",
-            dataIndex: 'stationArea'
-          },
-          {
-            title:'站点名称',
-            align:"center",
-            dataIndex: 'cnName'
-          },
+
           {
             title: '操作',
             dataIndex: 'action',
@@ -194,6 +199,20 @@
     methods: {
       initDictConfig(){
       },
+      /** 单元格点击事件*/
+      cellClick(record) {
+        return {
+          style: {
+            // 'color': 'blue', //这里将名称变了下色
+          },
+          on: {
+            click: () => { //点击事件，也可以加其他事件
+              // this.$router.push({path: '/profile/advanced',query:{record: record}})
+              this.handleEdit(record);
+            }
+          }
+        }
+      },
       getSuperFieldList(){
         let fieldList=[];
         fieldList.push({type:'string',value:'enName',text:'站点名称(英)',dictCode:''})
@@ -201,12 +220,12 @@
         fieldList.push({type:'string',value:'phone',text:'联系手机',dictCode:''})
         fieldList.push({type:'string',value:'tel',text:'联系电话',dictCode:''})
         fieldList.push({type:'string',value:'address',text:'地址',dictCode:''})
-        fieldList.push({type:'string',value:'country',text:'国家'})
-        fieldList.push({type:'string',value:'state',text:'省/州',dictCode:'{ 	table: "zm_tool_states", 	txt: "cname", 	key: "id", 	linkField: "city,country", 	idField: "id", 	pidField: "country_id" },,'})
+        fieldList.push({type:'sel_search',value:'country',text:'国家',dictTable:'zm_tool_countries', dictText:'cname', dictCode:'cname'})
+        fieldList.push({type:'string',value:'state',text:'省/州',dictCode:''})
         fieldList.push({type:'string',value:'city',text:'城市',dictCode:''})
         fieldList.push({type:'string',value:'postCode',text:'邮编',dictCode:''})
         fieldList.push({type:'string',value:'stationStatus',text:'状态',dictCode:'status'})
-        fieldList.push({type:'string',value:'stationArea',text:'收货区域',dictCode:''})
+        fieldList.push({type:'sel_search',value:'stationArea',text:'收货区域',dictTable:'zm_area_receiving', dictText:'area_name', dictCode:'area_name'})
         fieldList.push({type:'string',value:'cnName',text:'站点名称',dictCode:''})
         this.superFieldList = fieldList
       }

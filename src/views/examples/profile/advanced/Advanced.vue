@@ -2,15 +2,17 @@
   <page-layout :title="pageTitle" logo="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png">
 
     <detail-list slot="headerContent" size="small" :col="2" class="detail-layout">
-      <detail-list-item term="客户">{{ myProp.name}}</detail-list-item>
+
+      <detail-list-item term="客户">{{ myProp}}</detail-list-item>
       <detail-list-item term="目的地">{{ myProp.destination}}</detail-list-item>
-      <detail-list-item term="服务类型">{{ myProp.service_dictText}}</detail-list-item>
-      <detail-list-item term="目的地">{{ myProp.destination}}</detail-list-item>
+      <detail-list-item term="发往国家" >{{serviceList.country}}</detail-list-item>
+      <detail-list-item term="服务类型">{{ myProp.service}}</detail-list-item>
+      <detail-list-item term="交货条款">{{ serviceList.deliveryTerms}}</detail-list-item>
       <detail-list-item term="订购产品">{{myProp.enname}}</detail-list-item>
       <detail-list-item term="创建时间">{{ myProp.createTime }}</detail-list-item>
-      <detail-list-item term="关联单据"><a>12421</a></detail-list-item>
+      <detail-list-item term="FBA号"><a>{{ myProp.fbaId }}1</a></detail-list-item>
       <detail-list-item term="创建日期">{{ myProp.createTime }}</detail-list-item>
-      <detail-list-item term="备注">{{ myProp.remark }}</detail-list-item>
+      <detail-list-item term="备注" >{{myProp.remark}}</detail-list-item>
     </detail-list>
     <a-row slot="extra" class="status-list">
       <a-col :xs="12" :sm="12">
@@ -19,9 +21,8 @@
         <div class="heading" v-else-if="status == 1">已收货</div>
         <div class="heading" v-else-if="status == 2">装运中</div>
         <div class="heading" v-else-if="status == 3">已签收</div>
-        <div class="heading" v-else-if="status == 5">退件</div>
-        <div class="heading" v-else-if="status == 6">已取消</div>
-
+        <div class="heading" v-else-if="status == 4">退件</div>
+        <div class="heading" v-else-if="status == 5">已取消</div>
 
       </a-col>
       <a-col :xs="12" :sm="12">
@@ -33,12 +34,38 @@
     <template slot="action">
       <a-button-group style="margin-right: 4px;">
         <a-button>导出运单</a-button>
-        <a-button>操作</a-button>
+        <a-button type="danger">
+          取消订单
+        </a-button>
         <a-button><a-icon type="ellipsis"/></a-button>
       </a-button-group>
       <a-button type="primary" >主操作</a-button>
     </template>
 
+    <a-card style="margin-top: 24px" :bordered="false" title="基础信息">
+      <detail-list>
+
+        <detail-list-item term="收件人">{{myProp.recipient}}<br>{{warehouseDetail.address1}}</detail-list-item>
+        <detail-list-item term="发件人"></detail-list-item>
+
+        <detail-list-item term="地址">{{warehouseDetail.address1}}</detail-list-item>
+        <detail-list-item term="身份证">{{myProp.recipient}}</detail-list-item>
+        <detail-list-item term="报关方式">{{myProp.customsDeclarationMethod_dictText}}</detail-list-item>
+        <detail-list-item term="交税方式">{{myProp.taxPaymentMethod_dictText}}</detail-list-item>
+        <detail-list-item term="申报币种">{{myProp.recipient}}</detail-list-item>
+        <detail-list-item term="客户单号">{{myProp.waybillId}}</detail-list-item>
+        <detail-list-item term="Amazon Reference ID">{{myProp.recipient}}</detail-list-item>
+        <detail-list-item term="扩展单号">{{myProp.recipient}}</detail-list-item>
+        <detail-list-item term="属性">{{myProp.itemProperties}}</detail-list-item>
+      </detail-list>
+      <detail-list title="尺寸">
+        <detail-list-item term="收费重">{{ serviceList }}</detail-list-item>
+        <detail-list-item term="实重">--</detail-list-item>
+        <detail-list-item term="材积重">--</detail-list-item>
+        <detail-list-item term="计泡系数">{{ serviceList.bubble }}</detail-list-item>
+        <detail-list-item term="体积">--</detail-list-item>
+        <detail-list-item term="箱数">--</detail-list-item>
+      </detail-list>
     <a-card :bordered="false" title="流程进度">
       <a-steps :direction="isMobile() && 'vertical' || 'horizontal'" :current="1" progressDot>
         <a-step title="创建项目">
@@ -52,27 +79,6 @@
       </a-steps>
     </a-card>
 
-    <a-card style="margin-top: 24px" :bordered="false" title="基础信息">
-      <detail-list>
-        <detail-list-item term="收件人">{{myProp.recipient}}</detail-list-item>
-        <detail-list-item term="发件人">{{myProp.recipient}}</detail-list-item>
-        <detail-list-item term="身份证">{{myProp.recipient}}</detail-list-item>
-        <detail-list-item term="报关方式">{{myProp.customsDeclarationMethod_dictText}}</detail-list-item>
-        <detail-list-item term="交税方式">{{myProp.taxPaymentMethod_dictText}}</detail-list-item>
-        <detail-list-item term="申报币种">{{myProp.recipient}}</detail-list-item>
-        <detail-list-item term="客户单号">{{myProp.waybillId}}</detail-list-item>
-        <detail-list-item term="Amazon Reference ID">{{myProp.recipient}}</detail-list-item>
-        <detail-list-item term="扩展单号">{{myProp.recipient}}</detail-list-item>
-        <detail-list-item term="属性">{{myProp.itemProperties}}</detail-list-item>
-      </detail-list>
-      <detail-list title="尺寸">
-        <detail-list-item term="收费重">---</detail-list-item>
-        <detail-list-item term="实重">--</detail-list-item>
-        <detail-list-item term="材积重">--</detail-list-item>
-        <detail-list-item term="计泡系数">--</detail-list-item>
-        <detail-list-item term="体积">--</detail-list-item>
-        <detail-list-item term="箱数">--</detail-list-item>
-      </detail-list>
       <a-card type="inner" title="多层信息组">
         <detail-list title="组名称" size="small">
           <detail-list-item term="负责人">林东东</detail-list-item>
@@ -151,6 +157,7 @@
   import { mixinDevice } from '@/utils/mixin.js'
   import PageLayout from '@/components/page/PageLayout'
   import DetailList from '@/components/tools/DetailList'
+  import { handleDetailss } from '../../../../api/manage'
 
   const DetailListItem = DetailList.Item
 
@@ -167,6 +174,10 @@
         pageTitle:this.myProp.waybillId+'/'+this.myProp.orderId+'/'+this.myProp.name,
         status:this.myProp.status,
         data:this.myProp,
+        service: this.myProp.service,
+        warehouse:this.myProp.warehouseId,
+        serviceList:"",
+        warehouseDetail:"",
         tabList: [
           {
             key: '1',
@@ -300,13 +311,53 @@
       }
     },
     created() {
+    },
+    mounted:function(){
+      this.getServiceDetails(this.service);
 
+      this.getWarehouseDetails(this.warehouse);
+
+
+
+    },
+    methods:{
+      async getServiceDetails(record){
+        let list = '/zmexpress/zmService/queryByName';
+        let params = record;
+        this.serviceList =await handleDetailss(list, {name: params}).then(res => {
+          if (res.success) {
+            return res.result;
+          }
+        });
+        if (this.serviceList.deliveryTerms==='0'){
+          this.serviceList.deliveryTerms='DDU';
+        }
+      },
+      async getWarehouseDetails(record){
+        let list = '/zmexpress/zmFbaWarehouse/listZmFbaWarehouseDetailById';
+        let params = record;
+        this.warehouseDetail =await handleDetailss(list, {code: params}).then(res => {
+          if (res.success) {
+            return res.result;
+          }
+        });
+        if (this.warehouseDetail!=null){
+          this.myProp.recipient=this.warehouseDetail.linkman;
+
+        }
+      },
     },
     watch:{
       myProp(data){
         this.pageTitle=this.myProp.waybillId+'/'+this.myProp.orderId+'/'+this.myProp.name;
         this.status = this.myProp.status;
       },
+      myProp: function (val, oldVal) {
+        this.service=val.service;
+       this.getServiceDetails(val.service);
+       this.warehouseId = val.warehouseId;
+       this.getWarehouseDetails(val.warehouseId);
+  },
 
     },
     props:{

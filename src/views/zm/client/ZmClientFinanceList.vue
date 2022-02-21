@@ -99,6 +99,7 @@
         immediate: true,
         handler(val) {
           if(!this.mainId){
+            console.log(this.mainId)
             this.clearList()
           }else{
             this.queryParam['codeId'] = val
@@ -164,6 +165,7 @@
     },
     computed: {
       importExcelUrl(){
+
         return `${window._CONFIG['domianURL']}/${this.url.importUrl}/${this.mainId}`;
       }
     },

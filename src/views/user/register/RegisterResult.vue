@@ -6,6 +6,7 @@
 
     <template slot="action">
       <a-button size="large" style="margin-left: 8px" @click="goHomeHandle">返回首页</a-button>
+<!--      <a-button size="large" style="margin-left: 8px" @click=" goCertifyHandle">补充认证资料</a-button>-->
     </template>
 
   </result>
@@ -40,8 +41,14 @@
         let params={};
         params.username=this.model.username;
         params.password=this.model.password;
-        console.log(params);
         this.$router.push({name:'login',params})
+      },
+
+      goCertifyHandle () {
+        let params={};
+        params.username=this.model.username;
+        params.password=this.model.password;
+        this.$router.push({name:'certify',params})
       },
     }
   }

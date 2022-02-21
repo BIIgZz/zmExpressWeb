@@ -4,10 +4,22 @@
       <a-form-model ref="form" :model="model" :rules="validatorRules" slot="detail">
         <a-row>
           <a-col :span="12">
+            <a-form-model-item label="站点名称" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="cnName">
+              <a-input v-model="model.cnName" placeholder="请输入站点名称"  ></a-input>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="12">
             <a-form-model-item label="站点名称(英)" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="enName">
               <a-input v-model="model.enName" placeholder="请输入站点名称(英)"  ></a-input>
             </a-form-model-item>
           </a-col>
+
+          <a-col :span="12">
+            <a-form-model-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="stationStatus">
+              <j-dict-select-tag type="list" v-model="model.stationStatus" dictCode="status" placeholder="请选择状态" />
+            </a-form-model-item>
+          </a-col>
+
           <a-col :span="12">
             <a-form-model-item label="负责人" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="leader">
               <a-input v-model="model.leader" placeholder="请输入负责人"  ></a-input>
@@ -30,7 +42,7 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="国家" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="country">
-              <a-input v-model="model.country" placeholder="请输入国家"  ></a-input>
+              <j-search-select-tag v-model="model.country" dict="zm_tool_countries,cname,cname"  />
             </a-form-model-item>
           </a-col>
           <a-col :span="12">
@@ -48,21 +60,7 @@
               <a-input v-model="model.postCode" placeholder="请输入邮编"  ></a-input>
             </a-form-model-item>
           </a-col>
-          <a-col :span="12">
-            <a-form-model-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="stationStatus">
-              <j-dict-select-tag type="list" v-model="model.stationStatus" dictCode="status" placeholder="请选择状态" />
-            </a-form-model-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-model-item label="收货区域" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="stationArea">
-              <a-input v-model="model.stationArea" placeholder="请输入收货区域"  ></a-input>
-            </a-form-model-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-model-item label="站点名称" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="cnName">
-              <a-input v-model="model.cnName" placeholder="请输入站点名称"  ></a-input>
-            </a-form-model-item>
-          </a-col>
+
         </a-row>
       </a-form-model>
     </j-form-container>

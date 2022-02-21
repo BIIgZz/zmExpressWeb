@@ -63,8 +63,22 @@
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无图片</span>
           <img v-else :src="getImgView(text)" height="25px" alt="" style="max-width:80px;font-size: 12px;font-style: italic;"/>
         </template>
-
       </s-table>
+
+      <div>
+        <a-button type="primary" @click="showDrawer">
+          Open
+        </a-button>
+        <a-drawer
+          title="Basic Drawer"
+          :placement="bottom"
+          :closable="false"
+          :visible="visible"
+          @close="onClose"
+        >
+          <zm-bill-waybill-detail ></zm-bill-waybill-detail>
+        </a-drawer>
+      </div>
 
       <div class="title">退货进度</div>
       <s-table
@@ -121,11 +135,14 @@ import DetailList from '@/components/tools/DetailList'
 import ABadge from "ant-design-vue/es/badge/Badge"
 import { JeecgListMixin } from '../../../../mixins/JeecgListMixin'
 import { handleDetailss } from '../../../../api/manage'
+import ZmBillWaybillDetail from './ZmBillWaybillDetail'
+
 const DetailListItem = DetailList.Item
 
 export default {
   mixins:[JeecgListMixin],
   components: {
+    ZmBillWaybillDetail,
     PageLayout,
     ABadge,
     DetailList,
@@ -337,7 +354,7 @@ export default {
           return res
         })
       },
-
+      visible: false,
       superFieldList:[],
       dataList: []
     }
@@ -351,6 +368,12 @@ export default {
   },
 
   methods:{
+    showDrawer() {
+      this.visible = true;
+    },
+    onClose() {
+      this.visible = false;
+    },
     getList(){
       let fbaDtail={};
       fbaDtail = this.$route.query.record

@@ -183,6 +183,7 @@
           return this.$http.get('/mock/api/service', {
             params: Object.assign(parameter, this.queryParam)
           }).then(res => {
+            console.log(res.result)
             return res.result
           })
         },

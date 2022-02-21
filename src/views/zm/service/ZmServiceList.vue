@@ -39,7 +39,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('zm_service')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('服务')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -125,7 +125,7 @@
   import '@/assets/less/TableExpand.less'
   import { mixinDevice } from '@/utils/mixin'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  import ZmServiceModal from './modules/ZmServiceModal'
+  import ZmServiceModal from './modules/ZmServiceModal.Style#Drawer'
   import {filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
@@ -136,7 +136,7 @@
     },
     data () {
       return {
-        description: 'zm_service管理页面',
+        description: '服务管理页面',
         // 表头
         columns: [
           {
@@ -175,6 +175,11 @@
             dataIndex: 'weighingMethod_dictText'
           },
           {
+            title:'进位方式',
+            align:"center",
+            dataIndex: 'carryMethod_dictText'
+          },
+          {
             title:'计泡系数',
             align:"center",
             dataIndex: 'bubble'
@@ -183,6 +188,118 @@
             title:'分泡比例',
             align:"center",
             dataIndex: 'bubbleSplittingRatio'
+          },
+          {
+            title:'运单号规则',
+            align:"center",
+            dataIndex: 'waybilRules'
+          },
+          {
+            title:'申报后补',
+            align:"center",
+            dataIndex: 'supplementAfterDeclaration',
+            customRender: (text) => (text ? filterMultiDictText(this.dictOptions['supplementAfterDeclaration'], text) : ''),
+          },
+          {
+            title:'取消方式',
+            align:"center",
+            dataIndex: 'cancelMethod_dictText'
+          },
+          {
+            title:'票记重精度',
+            align:"center",
+            dataIndex: 'ticketWeightAccuracy'
+          },
+          {
+            title:'箱记重精度',
+            align:"center",
+            dataIndex: 'caseWeightAccuracy'
+          },
+          {
+            title:'尺寸精度',
+            align:"center",
+            dataIndex: 'sizeAccuracy'
+          },
+          {
+            title:'最小件数',
+            align:"center",
+            dataIndex: 'minPieceNum'
+          },
+          {
+            title:'最大件数',
+            align:"center",
+            dataIndex: 'maxPieceNum'
+          },
+          {
+            title:'最低箱实重',
+            align:"center",
+            dataIndex: 'minBoxWeight'
+          },
+          {
+            title:'最低箱材重',
+            align:"center",
+            dataIndex: 'minBoxMaterialWeight'
+          },
+          {
+            title:'最低箱收费重',
+            align:"center",
+            dataIndex: 'minBoxChargeWeight'
+          },
+          {
+            title:'最低箱均重',
+            align:"center",
+            dataIndex: 'minBoxAverageWeight'
+          },
+          {
+            title:'最低票收费重',
+            align:"center",
+            dataIndex: 'minTicketChargeWeight'
+          },
+          {
+            title:'最小票实重',
+            align:"center",
+            dataIndex: 'minTicketWeight'
+          },
+          {
+            title:'最大票实重',
+            align:"center",
+            dataIndex: 'maxTicketWeight'
+          },
+          {
+            title:'最大票收费重',
+            align:"center",
+            dataIndex: 'maxTicketChargeWeight'
+          },
+          {
+            title:'最大箱实重',
+            align:"center",
+            dataIndex: 'maxBoxWeight'
+          },
+          {
+            title:'用户等级',
+            align:"center",
+            dataIndex: 'userLevel_dictText'
+          },
+          {
+            title:'指定用户',
+            align:"center",
+            dataIndex: 'designatedUser'
+          },
+          {
+            title:'时效',
+            align:"center",
+            dataIndex: 'aging'
+          },
+          {
+            title:'默认交货区域',
+            align:"center",
+            dataIndex: 'area'
+          },
+          {
+            title:'是否显示',
+            align:"center",
+            dataIndex: 'display',
+            customRender: (text) => (text ? filterMultiDictText(this.dictOptions['display'], text) : ''),
           },
           {
             title:'创建人',
@@ -200,7 +317,7 @@
             dataIndex: 'updateBy'
           },
           {
-            title:'update_time',
+            title:'更新时间',
             align:"center",
             dataIndex: 'updateTime'
           },
@@ -231,6 +348,8 @@
       }
     },
     created() {
+      this.$set(this.dictOptions, 'supplementAfterDeclaration', [{text:'是',value:'Y'},{text:'否',value:'N'}])
+      this.$set(this.dictOptions, 'display', [{text:'是',value:'Y'},{text:'否',value:'N'}])
     this.getSuperFieldList();
     },
     computed: {
@@ -248,27 +367,49 @@
         fieldList.push({type:'string',value:'serviceSort',text:'服务分类',dictCode:'service_sort'})
         fieldList.push({type:'string',value:'billingPlan',text:'计费方式',dictCode:'bill'})
         fieldList.push({type:'string',value:'weighingMethod',text:'计重方式',dictCode:'weight'})
+        fieldList.push({type:'string',value:'carryMethod',text:'进位方式',dictCode:'carry_method'})
         fieldList.push({type:'string',value:'bubble',text:'计泡系数',dictCode:''})
-        fieldList.push({type:'string',value:'bubbleSplittingRatio',text:'分泡比例',dictCode:''})
-        fieldList.push({type:'string',value:'salesCommissionBase',text:'销售提成基数',dictCode:''})
+        fieldList.push({type:'double',value:'bubbleSplittingRatio',text:'分泡比例',dictCode:''})
+        fieldList.push({type:'string',value:'salesCommissionBase',text:'销售提成基数',dictCode:'sales_base'})
         fieldList.push({type:'string',value:'salesCommission',text:'销售提成比例',dictCode:''})
         fieldList.push({type:'string',value:'salesCommissionUnitPrice',text:'销售提成单价',dictCode:''})
         fieldList.push({type:'string',value:'numberRules',text:'运单号规则',dictCode:''})
         fieldList.push({type:'string',value:'tagCode',text:'标签代码',dictCode:''})
+        fieldList.push({type:'string',value:'waybilRules',text:'运单号规则',dictCode:''})
+        fieldList.push({type:'switch',value:'supplementAfterDeclaration',text:'申报后补'})
         fieldList.push({type:'string',value:'status',text:'状态',dictCode:'service_status'})
-        fieldList.push({type:'string',value:'sender',text:'发件人',dictCode:''})
+        fieldList.push({type:'string',value:'cancelMethod',text:'取消方式',dictCode:'cancel_method'})
+        fieldList.push({type:'string',value:'sender',text:'发件人',dictCode:'fill_in'})
         fieldList.push({type:'string',value:'customsDeclarationMethod',text:'支持报关方式',dictCode:'customs_eclaration'})
         fieldList.push({type:'string',value:'customsLearanceMethod',text:'支持清关方式',dictCode:'customs_clearance'})
-        fieldList.push({type:'list_multi',value:'taxPaymentMethod',text:'支持交税方式',dictTable:'', dictText:'', dictCode:'tax_payment'})
+        fieldList.push({type:'string',value:'taxPaymentMethod',text:'支持交税方式',dictCode:'tax_payment'})
         fieldList.push({type:'string',value:'deliveryTerms',text:'支持交货条款',dictCode:'delivery_terms'})
+        fieldList.push({type:'string',value:'ticketWeightAccuracy',text:'票记重精度',dictCode:''})
+        fieldList.push({type:'string',value:'caseWeightAccuracy',text:'箱记重精度',dictCode:''})
+        fieldList.push({type:'string',value:'sizeAccuracy',text:'尺寸精度',dictCode:''})
+        fieldList.push({type:'string',value:'minPieceNum',text:'最小件数',dictCode:''})
+        fieldList.push({type:'string',value:'maxPieceNum',text:'最大件数',dictCode:''})
+        fieldList.push({type:'string',value:'minBoxWeight',text:'最低箱实重',dictCode:''})
+        fieldList.push({type:'string',value:'minBoxMaterialWeight',text:'最低箱材重',dictCode:''})
+        fieldList.push({type:'string',value:'minBoxChargeWeight',text:'最低箱收费重',dictCode:''})
+        fieldList.push({type:'string',value:'minBoxAverageWeight',text:'最低箱均重',dictCode:''})
+        fieldList.push({type:'string',value:'minTicketChargeWeight',text:'最低票收费重',dictCode:''})
+        fieldList.push({type:'string',value:'minTicketWeight',text:'最小票实重',dictCode:''})
+        fieldList.push({type:'string',value:'maxTicketWeight',text:'最大票实重',dictCode:''})
+        fieldList.push({type:'string',value:'maxTicketChargeWeight',text:'最大票收费重',dictCode:''})
+        fieldList.push({type:'string',value:'maxBoxWeight',text:'最大箱实重',dictCode:''})
+        fieldList.push({type:'string',value:'userLevel',text:'用户等级',dictCode:'zm_user_level,name,name'})
+        fieldList.push({type:'string',value:'designatedUser',text:'指定用户',dictCode:''})
+        fieldList.push({type:'string',value:'aging',text:'时效',dictCode:''})
+        fieldList.push({type:'string',value:'area',text:'默认交货区域',dictCode:'zm_area_receiving,area_name,area_name'})
+        fieldList.push({type:'switch',value:'display',text:'是否显示'})
         fieldList.push({type:'string',value:'electric',text:'带电标识',dictCode:''})
-        fieldList.push({type:'string',value:'boxWeight',text:'最低箱收费重',dictCode:''})
         fieldList.push({type:'string',value:'country',text:'到达国家',dictCode:''})
         fieldList.push({type:'list_multi',value:'reportingCurrency',text:'申报币种',dictTable:'', dictText:'', dictCode:'currency'})
         fieldList.push({type:'string',value:'createBy',text:'创建人',dictCode:''})
         fieldList.push({type:'string',value:'createTime',text:'创建日期',dictCode:''})
         fieldList.push({type:'string',value:'updateBy',text:'更新人',dictCode:''})
-        fieldList.push({type:'string',value:'updateTime',text:'update_time',dictCode:''})
+        fieldList.push({type:'string',value:'updateTime',text:'更新时间',dictCode:''})
         fieldList.push({type:'string',value:'sysOrgCode',text:'所属部门',dictCode:''})
         this.superFieldList = fieldList
       }

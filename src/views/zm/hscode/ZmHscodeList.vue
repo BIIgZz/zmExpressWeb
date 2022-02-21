@@ -12,7 +12,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('hscode')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('hscode(已导出)')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -98,8 +98,8 @@
   import '@/assets/less/TableExpand.less'
   import { mixinDevice } from '@/utils/mixin'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  // import ZmHscodeModal from './modules/ZmHscodeModal'
-  import ZmHscodeModal from './modules/ZmHscodeModal__Style#Drawer'
+  import ZmHscodeModal from './modules/ZmHscodeModal'
+
   export default {
     name: 'ZmHscodeList',
     mixins:[JeecgListMixin, mixinDevice],
@@ -108,7 +108,7 @@
     },
     data () {
       return {
-        description: 'hscode管理页面',
+        description: 'hscode(已导出)管理页面',
         // 表头
         columns: [
           {
@@ -124,6 +124,7 @@
           {
             title:'海关编码',
             align:"center",
+            sorter: true,
             dataIndex: 'hscode'
           },
           {
@@ -132,24 +133,53 @@
             dataIndex: 'description'
           },
           {
-            title:'材料',
+            title:'材质',
             align:"center",
+            sorter: true,
             dataIndex: 'material'
           },
           {
             title:'原始名称',
             align:"center",
+            sorter: true,
             dataIndex: 'originalName'
           },
           {
             title:'建议名称',
             align:"center",
+            sorter: true,
             dataIndex: 'suggestedName'
           },
           {
             title:'税率',
             align:"center",
+            sorter: true,
             dataIndex: 'rateTax'
+          },
+          {
+            title:'美国海关编码',
+            align:"center",
+            dataIndex: 'hscodeUsa'
+          },
+          {
+            title:'美国税率',
+            align:"center",
+            dataIndex: 'taxUsa'
+          },
+          {
+            title:'美国建议名称',
+            align:"center",
+            dataIndex: 'nameUsa'
+          },
+          {
+            title:'增税',
+            align:"center",
+            dataIndex: 'raiseTaxes'
+          },
+          {
+            title:'备注',
+            align:"center",
+            dataIndex: 'remark'
           },
           {
             title: '操作',
@@ -166,7 +196,7 @@
           deleteBatch: "/zmexpress/zmHscode/deleteBatch",
           exportXlsUrl: "/zmexpress/zmHscode/exportXls",
           importExcelUrl: "zmexpress/zmHscode/importExcel",
-
+          
         },
         dictOptions:{},
         superFieldList:[],
@@ -187,10 +217,15 @@
         let fieldList=[];
         fieldList.push({type:'string',value:'hscode',text:'海关编码',dictCode:''})
         fieldList.push({type:'string',value:'description',text:'描述',dictCode:''})
-        fieldList.push({type:'string',value:'material',text:'材料',dictCode:''})
+        fieldList.push({type:'string',value:'material',text:'材质',dictCode:''})
         fieldList.push({type:'string',value:'originalName',text:'原始名称',dictCode:''})
         fieldList.push({type:'string',value:'suggestedName',text:'建议名称',dictCode:''})
         fieldList.push({type:'string',value:'rateTax',text:'税率',dictCode:''})
+        fieldList.push({type:'string',value:'hscodeUsa',text:'美国海关编码',dictCode:''})
+        fieldList.push({type:'string',value:'taxUsa',text:'美国税率',dictCode:''})
+        fieldList.push({type:'string',value:'nameUsa',text:'美国建议名称',dictCode:''})
+        fieldList.push({type:'string',value:'raiseTaxes',text:'增税',dictCode:''})
+        fieldList.push({type:'string',value:'remark',text:'备注',dictCode:''})
         this.superFieldList = fieldList
       }
     }

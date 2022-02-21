@@ -62,6 +62,14 @@ export function getAction(url,parameter) {
     headers: signHeader
   })
 }
+export function handleDetailss(list,parameter) {
+  return axios({
+    url: list,
+    method: 'get',
+    params: parameter
+  })
+}
+
 
 //deleteAction
 export function deleteAction(url,parameter) {

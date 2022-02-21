@@ -14,47 +14,47 @@
 
 <script>
 
-  import ZmBillloadingForm from './ZmBillloadingForm'
-  export default {
-    name: 'ZmBillloadingModal',
-    components: {
-      ZmBillloadingForm
+import ZmBillloadingForm from './ZmBillloadingForm'
+export default {
+  name: 'ZmBillloadingModal',
+  components: {
+    ZmBillloadingForm
+  },
+  data () {
+    return {
+      title:'',
+      width:896,
+      visible: false,
+      disableSubmit: false
+    }
+  },
+  methods: {
+    add () {
+      this.visible=true
+      this.$nextTick(()=>{
+        this.$refs.realForm.add();
+      })
     },
-    data () {
-      return {
-        title:'',
-        width:800,
-        visible: false,
-        disableSubmit: false
-      }
+    edit (record) {
+      this.visible=true
+      this.$nextTick(()=>{
+        this.$refs.realForm.edit(record);
+      })
     },
-    methods: {
-      add () {
-        this.visible=true
-        this.$nextTick(()=>{
-          this.$refs.realForm.add();
-        })
-      },
-      edit (record) {
-        this.visible=true
-        this.$nextTick(()=>{
-          this.$refs.realForm.edit(record);
-        })
-      },
-      close () {
-        this.$emit('close');
-        this.visible = false;
-      },
-      handleOk () {
-        this.$refs.realForm.submitForm();
-      },
-      submitCallback(){
-        this.$emit('ok');
-        this.visible = false;
-      },
-      handleCancel () {
-        this.close()
-      }
+    close () {
+      this.$emit('close');
+      this.visible = false;
+    },
+    handleOk () {
+      this.$refs.realForm.submitForm();
+    },
+    submitCallback(){
+      this.$emit('ok');
+      this.visible = false;
+    },
+    handleCancel () {
+      this.close()
     }
   }
+}
 </script>

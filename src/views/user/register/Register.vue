@@ -1,5 +1,5 @@
 <template>
-  <div class="main user-layout-register">
+  <div class="main user-layout-register" >
     <h3><span>注册</span></h3>
     <a-form-model ref="form" :model="model" :rules="validatorRules">
       <a-form-model-item prop="username">
@@ -40,6 +40,10 @@
           </a-select>
         </a-input>
       </a-form-model-item>
+      <a-form-model-item prop="email">
+        <a-input v-model="model.email" size="large" placeholder="请输入邮箱">
+        </a-input>
+      </a-form-model-item>
       <!--<a-input-group size="large" compact>
             <a-select style="width: 20%" size="large" defaultValue="+86">
               <a-select-option value="+86">+86</a-select-option>
@@ -48,23 +52,23 @@
             <a-input style="width: 80%" size="large" placeholder="11 位手机号"></a-input>
           </a-input-group>-->
 
-      <a-row :gutter="16">
-        <a-col class="gutter-row" :span="16">
-          <a-form-model-item prop="captcha">
-            <a-input v-model="model.captcha" size="large" type="text" placeholder="验证码">
-              <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-            </a-input>
-          </a-form-model-item>
-        </a-col>
-        <a-col class="gutter-row" :span="8">
-          <a-button
-            class="getCaptcha"
-            size="large"
-            :disabled="state.smsSendBtn"
-            @click.stop.prevent="getCaptcha"
-            v-text="!state.smsSendBtn && '获取验证码'||(state.time+' s')"></a-button>
-        </a-col>
-      </a-row>
+<!--      <a-row :gutter="16">-->
+<!--        <a-col class="gutter-row" :span="16">-->
+<!--          <a-form-model-item prop="captcha">-->
+<!--            <a-input v-model="model.captcha" size="large" type="text" placeholder="验证码">-->
+<!--              <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>-->
+<!--            </a-input>-->
+<!--          </a-form-model-item>-->
+<!--        </a-col>-->
+<!--        <a-col class="gutter-row" :span="8">-->
+<!--          <a-button-->
+<!--            class="getCaptcha"-->
+<!--            size="large"-->
+<!--            :disabled="state.smsSendBtn"-->
+<!--            @click.stop.prevent="getCaptcha"-->
+<!--            v-text="!state.smsSendBtn && '获取验证码'||(state.time+' s')"></a-button>-->
+<!--        </a-col>-->
+<!--      </a-row>-->
 
       <a-form-model-item>
         <a-button
@@ -131,6 +135,10 @@
             { required: false },
             { validator: this.handlePhoneCheck }
           ],
+          email:[
+            { required: false },
+            { validator: this.handleEmailCheck }
+          ],
           captcha: [
             { required: false },
             { validator: this.handleCaptchaCheck }
@@ -176,22 +184,28 @@
       }
     },
       handleEmailCheck(rule, value, callback) {
-        let params = {
-          email: value,
-        };
-        checkOnlyUser(params).then((res) => {
-          if (res.success) {
-            callback()
-          } else {
-            callback("邮箱已存在!")
-          }
-        })
+        var reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+        if (!reg.test(value)) {
+          callback(new Error("请输入邮箱号"))
+        } else {
+          var params = {
+            email: value,
+          };
+          checkOnlyUser(params).then((res) => {
+            if (res.success) {
+              callback()
+            } else {
+              callback("邮箱已存在!")
+            }
+          })
+        }
       },
       handlePasswordLevel(rule, value, callback) {
         let level = 0
-        let reg = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/;
+        // let reg = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/;
+        let reg = /^(?=.*[a-z|A-Z])(?=.*\d).{8,}$/;
         if (!reg.test(value)) {
-          callback(new Error('密码由8位数字、大小写字母和特殊符号组成!'))
+          callback(new Error('密码由至少8位数字、大写或者小写字母组成!'))
         }
         // 判断这个字符串中有没有数字
         if (/[0-9]/.test(value)) {
@@ -219,7 +233,6 @@
           callback(new Error('密码强度不够'))
         }
       },
-
       handlePasswordCheck(rule, value, callback) {
         let password = this.model['password']
         //console.log('value', value)
@@ -255,7 +268,6 @@
         })
       }
     },
-
       handlePasswordInputClick() {
         if (!this.isMobile()) {
           this.state.passwordLevelChecked = true
@@ -263,16 +275,16 @@
         }
         this.state.passwordLevelChecked = false
       },
-
       handleSubmit() {
         this.$refs['form'].validate((success) => {
-          if (success==true) {
+          if (success == true) {
             let values = this.model
             let register = {
               username: values.username,
               password: values.password,
               phone: values.mobile,
-              smscode: values.captcha
+              smscode: values.captcha,
+              email: values.email
             };
             postAction("/sys/user/register", register).then((res) => {
               if (!res.success) {

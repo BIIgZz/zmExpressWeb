@@ -12,13 +12,13 @@
       </a-row>
 
     </div>
-    <j-form-container :disabled="formDisabled" v-show="visible_form">
+    <j-form-container :disabled="formDisabled" v-show="model.waybillId!=null">
       <!-- 主表单区域 -->
       <a-form-model ref="form" :model="model" :rules="validatorRules" slot="detail" >
         <a-row>
           <a-col :span="8" >
             <a-form-model-item label="运单号" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="waybillId" >
-              <a-input v-model="model.waybillId" placeholder="请输入运单号" ></a-input>
+              <a-input v-model="model.waybillId" placeholder="请输入运单号" :value='waybillId'></a-input>
             </a-form-model-item>
           </a-col>
           <a-col :span="8" >
@@ -211,7 +211,7 @@
       </a-form-model>
     </j-form-container>
       <!-- 子表单区域 -->
-    <a-tabs v-model="activeKey" @change="handleChangeTabs" v-show="visible_form">
+    <a-tabs v-model="activeKey" @change="handleChangeTabs" v-show="model.waybillId!=null">
       <a-tab-pane tab="货柜详情" :key="refKeys[0]" :forceRender="true">
         <j-editable-table
           :ref="refKeys[0]"
@@ -243,7 +243,7 @@
     },
     data() {
       return {
-        visible_form: true,
+        waybillId:"",
         labelCol: {
           xs: { span: 24 },
           sm: { span: 6 },
@@ -426,7 +426,7 @@
         url: {
           add: "/zmexpress/zmWaybill/add",
           edit: "/zmexpress/zmWaybill/edit",
-          queryById: "/zmexpress/zmWaybill/queryById",
+          queryByquerId: "/zmexpress/zmWaybill/queryById",
           zmImportGood: {
             list: '/zmexpress/zmWaybill/queryZmImportGoodByMainId'
           },
@@ -450,9 +450,10 @@
       },
     },
     created () {
-        if (this.model.waybillId==null){
-          this.visible_form = false;
-        }
+
+    },
+    watch:{
+
     },
     methods: {
       addBefore(){
@@ -488,25 +489,19 @@
             })
           })
       },
-      /** 获取订单号*/
+        /** 获取订单号*/
       getOrderNum() {
         putAction(this.url.rule.orderId, this.model).then(res => {
           // 执行成功，获取返回的值，并赋到页面上
           if (res.success) {
-            this.model.orderId = res.result
+            if( this.model.waybillId == null)
+              this.model.waybillId = res.result
           }
         })
       },
       /** 打开抽屉 */
       showDrawer() {
-        if (this.model.orderId==''){
-          this.getOrderNum();
-        }
-        if (this.model.name!=''){
-          this.visible_form = true;
-        }else if(this.model.name==' '){
-          this.visible_form = false;
-        }
+        this.getOrderNum();
       },
       /** 整理成formData */
       classifyIntoFormData(allValues) {

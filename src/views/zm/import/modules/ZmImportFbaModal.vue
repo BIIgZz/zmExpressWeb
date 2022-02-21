@@ -13,9 +13,7 @@
 </template>
 
 <script>
-
   import ZmImportFbaForm from './ZmImportFbaForm'
-
   export default {
     name: 'ZmImportFbaModal',
     components: {
@@ -24,7 +22,6 @@
     data() {
       return {
         title:'',
-        width:800,
         visible: false,
         disableSubmit: false
       }
@@ -40,11 +37,6 @@
         this.visible=true
         this.$nextTick(()=>{
           this.$refs.realForm.edit(record);
-        })
-      },
-      change (record) {
-        this.$http.paut('/zmexpress/zmImportFba/change',record).then((response) =>{
-            console.log(response);
         })
       },
       close () {

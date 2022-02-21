@@ -111,7 +111,7 @@
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('运单表')">导出</a-button>
-      <a-upload name="file" :showUploadList="true" :openFileDialogOnClick="true" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
+      <a-upload name="file" :showUploadList="false" :openFileDialogOnClick="true" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
 
@@ -166,6 +166,50 @@
         <template>
           <div>
             <a-tabs default-active-key="0"  type="card" @change="searchQuery"     v-model="queryParam.status">
+              <a-tab-pane key="" tab="全部" >
+                <template>
+                  <div>
+                    <a-button-group >
+                      <a-button icon="printer">打印标签</a-button>
+                      <a-button icon="close-circle">拦截/问题件</a-button>
+                      <a-button icon="redo">重新发货</a-button>
+                      <a-dropdown >
+                        <a-menu slot="overlay" @click="" icon="edit">
+                          <a-menu-item key="1">
+                            <a-icon type="edit"/>服务
+                          </a-menu-item>
+                          <a-menu-item key="2">
+                            <a-icon type="edit"/>供应商服务
+                          </a-menu-item>
+                          <a-menu-item key="3" >
+                            <a-icon type="edit"/>备注
+                          </a-menu-item>
+                          <a-menu-item key="4" >
+                            <a-icon type="edit"/>内部备注
+                          </a-menu-item>
+                        </a-menu>
+                        <a-button><a-icon type="edit"/> 批量修改  </a-button>
+                      </a-dropdown>
+                      <a-dropdown >
+                        <a-menu slot="overlay" @click="" icon="cloud-download">
+                          <a-menu-item key="1">
+                            <a-icon type="cloud-download"  @click="handleExportXls('导入fba表')"/>运单
+                          </a-menu-item>
+                          <a-menu-item key="2">
+                            <a-icon type="cloud-download"/>货箱
+                          </a-menu-item>
+                          <a-menu-item key="3" >
+                            <a-icon type="cloud-download"/>申报信息
+                          </a-menu-item>
+                        </a-menu>
+                        <a-button><a-icon type="cloud-download"/> 导出  </a-button>
+                      </a-dropdown>
+                      <a-button icon="plus-circle">入仓</a-button>
+
+                    </a-button-group>
+                  </div>
+                </template>
+              </a-tab-pane>
               <a-tab-pane key="0" tab="已下单"    >
                 <template>
                   <div>
@@ -204,7 +248,7 @@
                         </a-menu>
                         <a-button><a-icon type="cloud-download"/> 导出  </a-button>
                       </a-dropdown>
-                      <a-button type="danger" @click="change" key='0' > <a-icon type="close" />取消</a-button>
+                      <a-button type="danger" @click="cancel" key='0' > <a-icon type="close" />取消</a-button>
                     </a-button-group>
                   </div>
                 </template>
@@ -486,50 +530,7 @@
                   </div>
                 </template>
               </a-tab-pane>
-              <a-tab-pane key="" tab="全部" >
-                <template>
-                  <div>
-                    <a-button-group >
-                      <a-button icon="printer">打印标签</a-button>
-                      <a-button icon="close-circle">拦截/问题件</a-button>
-                      <a-button icon="redo">重新发货</a-button>
-                      <a-dropdown >
-                        <a-menu slot="overlay" @click="" icon="edit">
-                          <a-menu-item key="1">
-                            <a-icon type="edit"/>服务
-                          </a-menu-item>
-                          <a-menu-item key="2">
-                            <a-icon type="edit"/>供应商服务
-                          </a-menu-item>
-                          <a-menu-item key="3" >
-                            <a-icon type="edit"/>备注
-                          </a-menu-item>
-                          <a-menu-item key="4" >
-                            <a-icon type="edit"/>内部备注
-                          </a-menu-item>
-                        </a-menu>
-                        <a-button><a-icon type="edit"/> 批量修改  </a-button>
-                      </a-dropdown>
-                      <a-dropdown >
-                        <a-menu slot="overlay" @click="" icon="cloud-download">
-                          <a-menu-item key="1">
-                            <a-icon type="cloud-download"  @click="handleExportXls('导入fba表')"/>运单
-                          </a-menu-item>
-                          <a-menu-item key="2">
-                            <a-icon type="cloud-download"/>货箱
-                          </a-menu-item>
-                          <a-menu-item key="3" >
-                            <a-icon type="cloud-download"/>申报信息
-                          </a-menu-item>
-                        </a-menu>
-                        <a-button><a-icon type="cloud-download"/> 导出  </a-button>
-                      </a-dropdown>
-                      <a-button icon="plus-circle">入仓</a-button>
 
-                    </a-button-group>
-                  </div>
-                </template>
-              </a-tab-pane>
             </a-tabs>
           </div>
         </template>
@@ -544,9 +545,7 @@
         rowKey="id"
         class="j-table-force-nowrap"
         :scroll="{x:true}"
-
         :columns="defColumns"
-
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
@@ -596,6 +595,7 @@
 
           <a-divider type="vertical" />
           <a-dropdown>
+
             <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
             <a-menu slot="overlay">
               <a-menu-item>
@@ -619,7 +619,9 @@
         :after-visible-change="afterVisibleChange"
         @close="onClose"
       >
+<!--        <dataDetails> </dataDetails>-->
        <Advanced :myProp="testData"></Advanced>
+
       </a-drawer>
     </div>
 
@@ -637,13 +639,16 @@
   import {filterMultiDictText} from '@/components/dict/JDictSelectUtil'
   import '@/assets/less/TableExpand.less'
   import Vue from 'vue'
-
+  import axios from 'axios'
+  import { handleDetailss } from '../../../api/manage'
+  import dataDetails from './dataDetail'
   export default {
     name: "ZmWaybillList",
     mixins:[JeecgListMixin],
     components: {
       ZmWaybillModal,
-      Advanced
+      Advanced,
+      dataDetails
     },
     data () {
       return {
@@ -691,7 +696,7 @@
           {
             title:'客户名称',
             align:"center",
-            dataIndex: 'name_dictText'
+            dataIndex: 'name'
           },
           {
             title:'公司名',
@@ -912,7 +917,6 @@
     },
     methods: {
       afterVisibleChange(val) {
-        console.log('visible', val);
       },
       showDrawer() {
         this.visible = true;
@@ -928,6 +932,14 @@
         this.visible = false;
         this.handleImportExcel();
       },
+      /**收货*/
+      receiveItem(record){
+        console.log("收货")
+
+        this.$http.put("/zmexpress/zmWaybill/changeStatus?id="+record.id+"&operate=2").then((response) =>{
+          console.log(response);
+        })
+      },
 
       /** 单元格点击事件*/
       cellClick2(record) {
@@ -939,10 +951,21 @@
             click: () => { //点击事件，也可以加其他事件
               // this.$router.push({path: '/profile/advanced',query:{record: record}})
               this.testData=record;
+              this.receiveItem(record);
               this.showDrawer();
+              this.getCaseDetails(record);
             }
           }
         }
+      },
+      async getCaseDetails(record){
+        let list = '/zmexpress/zmWaybill/queryById'
+        let params = record.id
+        this.dataList =await handleDetailss(list, {id: params}).then(res => {
+          if (res.success) {
+
+          }
+        })
       },
       //列设置更改事件
       onColSettingsChange (checkedValues) {
@@ -963,7 +986,6 @@
       initColumns(){
         //权限过滤（列权限控制时打开，修改第二个参数为授权码前缀）
         //this.defColumns = colAuthFilter(this.defColumns,'testdemo:');
-
         var key = this.$route.name+":colsettings";
         let colSettings= Vue.ls.get(key);
         if(colSettings==null||colSettings==undefined){

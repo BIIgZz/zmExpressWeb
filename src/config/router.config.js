@@ -320,6 +320,11 @@ export const constantRouterMap = [
         name: 'alteration',
         component: () => import(/* webpackChunkName: "user" */ '@/views/user/alteration/Alteration')
       },
+      {
+        path: 'certify',
+        name: 'certify',
+        component: () => import(/* webpackChunkName: "user" */ '@/views/user/register/settings/Index')
+      },
     ]
   },
 

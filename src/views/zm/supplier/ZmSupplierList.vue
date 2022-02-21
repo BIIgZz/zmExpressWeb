@@ -135,9 +135,9 @@
   import '@/assets/less/TableExpand.less'
   import { mixinDevice } from '@/utils/mixin'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  // import ZmSupplierModal from './modules/ZmSupplierModal'
+  import ZmSupplierModal from './modules/ZmSupplierModal'
   import {filterMultiDictText} from '@/components/dict/JDictSelectUtil'
-  import ZmSupplierModal from './modules/ZmSupplierModal__Style#Drawer'
+
   export default {
     name: 'ZmSupplierList',
     mixins:[JeecgListMixin, mixinDevice],
@@ -159,7 +159,6 @@
               return parseInt(index)+1;
             }
           },
-
           {
             title:'供应商类型',
             align:"center",

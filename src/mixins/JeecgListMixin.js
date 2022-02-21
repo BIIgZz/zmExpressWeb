@@ -4,10 +4,12 @@
  * data中url定义 list为查询列表  delete为删除单条记录  deleteBatch为批量删除
  */
 import { filterObj } from '@/utils/util';
-import { deleteAction, getAction,downFile,getFileAccessHttpUrl } from '@/api/manage'
+import { deleteAction, getAction,downFile,getFileAccessHttpUrl, handleDetailss ,saveService,putAction} from '../api/manage'
 import Vue from 'vue'
 import { ACCESS_TOKEN, TENANT_ID } from "@/store/mutation-types"
 import store from '@/store'
+import {Modal} from 'ant-design-vue'
+import ZmImportFbaModal from '../views/zm/import/modules/ZmImportFbaModal'
 
 export const JeecgListMixin = {
   data(){
@@ -49,6 +51,13 @@ export const JeecgListMixin = {
       superQueryParams: '',
       /** 高级查询拼接方式 */
       superQueryMatchType: 'and',
+
+      /** 自定义文件名 */
+      /* fbaid */
+      dataFba:'',
+      /* 订舱单 */
+      datashippingOrder:'',
+      dataList: []
     }
   },
   created() {
@@ -84,7 +93,7 @@ export const JeecgListMixin = {
       this.loading = true;
       getAction(this.url.list, params).then((res) => {
         if (res.success) {
-          //update-begin---author:zhangyafei    Date:20201118  for：适配不分页的数据列表------------
+
           this.dataSource = res.result.records||res.result;
           if(res.result.total)
           {
@@ -92,12 +101,12 @@ export const JeecgListMixin = {
           }else{
             this.ipagination.total = 0;
           }
-          //update-end---author:zhangyafei    Date:20201118  for：适配不分页的数据列表------------
-        }else{
+
+        }
+        if(res.code===510){
           this.$message.warning(res.message)
         }
-      }).finally(() => {
-        this.loading = false
+        this.loading = false;
       })
     },
     initDictConfig(){
@@ -140,6 +149,8 @@ export const JeecgListMixin = {
     onSelectChange(selectedRowKeys, selectionRows) {
       this.selectedRowKeys = selectedRowKeys;
       this.selectionRows = selectionRows;
+      this.dataFba = this.selectionRows[0].fbaid;
+      this.datashippingOrder = this.selectionRows[0].shippingOrder;
     },
     onClearSelected() {
       this.selectedRowKeys = [];
@@ -147,10 +158,10 @@ export const JeecgListMixin = {
     },
     searchQuery() {
       this.loadData(1);
-      // 点击查询清空列表选中行
-      // https://gitee.com/jeecg/jeecg-boot/issues/I4KTU1
-      this.selectedRowKeys = []
-      this.selectionRows = []
+    },
+    searchQueryBill() {
+      this.onClearSelected();
+      this.loadData(1);
     },
     superQuery() {
       this.$refs.superQueryModal.show();
@@ -171,6 +182,7 @@ export const JeecgListMixin = {
         var ids = "";
         for (var a = 0; a < this.selectedRowKeys.length; a++) {
           ids += this.selectedRowKeys[a] + ",";
+          console.log(ids);
         }
         var that = this;
         this.$confirm({
@@ -195,6 +207,40 @@ export const JeecgListMixin = {
         });
       }
     },
+
+    cancel: function() {
+        if (this.selectedRowKeys.length <= 0) {
+          this.$message.warning('请选择一条记录！');
+          return;
+        } else {
+          var ids = "";
+          for (var a = 0; a < this.selectedRowKeys.length; a++) {
+            ids += this.selectedRowKeys[a] + ",";
+            console.log(ids);
+          }
+          var that = this;
+          this.$confirm({
+            title: "确认修改",
+            content: "是否修改选中数据?",
+            onOk: function() {
+              that.loading = true;
+              putAction(  '/zmexpress/zmWaybill/cancel',{ ids: ids }).then((res) => {
+                if (res.success) {
+                  //重新计算分页问题
+                  that.reCalculatePage(that.selectedRowKeys.length)
+                  that.$message.success(res.message);
+                  that.loadData();
+                  that.onClearSelected();
+                } else {
+                  that.$message.warning(res.message);
+                }
+              }).finally(() => {
+                that.loading = false;
+              });
+            }
+          });
+        }
+      },
     handleDelete: function (id) {
       if(!this.url.delete){
         this.$message.error("请设置url.delete属性!")
@@ -233,6 +279,16 @@ export const JeecgListMixin = {
       this.$refs.modalForm.title = "新增";
       this.$refs.modalForm.disableSubmit = false;
     },
+    addMsg: function (billDtail) {
+      this.$refs.modalLogisticeMsg.add(billDtail);
+      this.$refs.modalLogisticeMsg.title = "新增";
+      this.$refs.modalLogisticeMsg.disableSubmit = false;
+    },
+    changeStatus: function (record) {
+      this.$refs.modalForm.change(record);
+      this.$refs.modalForm.title = "修改";
+      this.$refs.modalForm.disableSubmit = false;
+    },
     handleTableChange(pagination, filters, sorter) {
       //分页、排序、筛选变化时触发
       //TODO 筛选
@@ -243,6 +299,7 @@ export const JeecgListMixin = {
       }
       this.ipagination = pagination;
       this.loadData();
+
     },
     handleToggleSearch(){
       this.toggleSearchStatus = !this.toggleSearchStatus;
@@ -257,11 +314,18 @@ export const JeecgListMixin = {
       //清空列表选中
       this.onClearSelected()
     },
+    handleDetails:function(record){
+      this.$router.push({path: '/profile/basic',query:{record: record}})
+    },
+    handleBillDetails:function(record){
+      this.$router.push({path: '/zm/billLoading/modules/billLoadingDetail',query:{record: record}})
+    },
     handleDetail:function(record){
       this.$refs.modalForm.edit(record);
       this.$refs.modalForm.title="详情";
       this.$refs.modalForm.disableSubmit = true;
     },
+
     /* 导出 */
     handleExportXls2(){
       let paramsStr = encodeURI(JSON.stringify(this.getQueryParams()));
@@ -276,7 +340,8 @@ export const JeecgListMixin = {
       if(this.selectedRowKeys && this.selectedRowKeys.length>0){
         param['selections'] = this.selectedRowKeys.join(",")
       }
-      console.log("导出参数",param)
+      fileName=fileName+this.getCurrentTime();
+      // console.log("导出参数",param)
       downFile(this.url.exportXlsUrl,param).then((data)=>{
         if (!data) {
           this.$message.warning("文件下载失败")
@@ -297,16 +362,45 @@ export const JeecgListMixin = {
         }
       })
     },
+    /* 导出装箱清单 */
+    handleExportXlsPackingList(fileName){
+      if(!fileName || typeof fileName != "string"){
+        fileName = "导出文件"
+      }
+      let param = this.getQueryParams();
+      if(this.selectedRowKeys && this.selectedRowKeys.length>0){
+        param['selections'] = this.selectedRowKeys.join(",")
+      }
+      console.log("导出参数",param)
+      downFile(this.url.exportXlsUrl,param).then((data)=>{
+        if (!data) {
+          this.$message.warning("文件下载失败")
+          return
+        }
+        if (typeof window.navigator.msSaveBlob !== 'undefined') {
+          window.navigator.msSaveBlob(new Blob([data],{type: 'application/vnd.ms-excel'}), this.datashippingOrder+'装柜清单.xls')
+        }else{
+          let url = window.URL.createObjectURL(new Blob([data],{type: 'application/vnd.ms-excel'}))
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', this.datashippingOrder+'装柜清单.xls')
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link); //下载完成移除元素
+          window.URL.revokeObjectURL(url); //释放掉blob对象
+        }
+      })
+    },
     /* 导入 */
     handleImportExcel(info){
-      this.loading = true;
+
       if (info.file.status !== 'uploading') {
         console.log(info.file, info.fileList);
       }
       if (info.file.status === 'done') {
-        this.loading = false;
         if (info.file.response.success) {
-          // this.$message.success(`${info.file.name} 文件上传成功`);
+           this.$message.success(`${info.file.name} 文件上传成功`);
           if (info.file.response.code === 201) {
             let { message, result: { msg, fileUrl, fileName } } = info.file.response
             let href = window._CONFIG['domianURL'] + fileUrl
@@ -326,12 +420,61 @@ export const JeecgListMixin = {
           this.$message.error(`${info.file.name} ${info.file.response.message}.`);
         }
       } else if (info.file.status === 'error') {
-        this.loading = false;
         if (info.file.response.status === 500) {
           let data = info.file.response
           const token = Vue.ls.get(ACCESS_TOKEN)
           if (token && data.message.includes("Token失效")) {
-            this.$error({
+            Modal.error({
+              title: '登录已过期',
+              content: '很抱歉，登录已过期，请重新登录',
+              okText: '重新登录',
+              mask: false,
+              onOk: () => {
+                store.dispatch('Logout').then(() => {
+                  Vue.ls.remove(ACCESS_TOKEN)
+                  window.location.reload();
+                })
+              }
+            })
+          }
+        } else {
+          this.$message.error(`文件上传失败: ${info.file.msg} `);
+        }
+      }
+    },
+    /* 导入文件和表单 */
+    handleImportExcelAndForm(info){
+      console.log('handleImportExcelAndForm ', info);
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        if (info.file.response.success) {
+          this.$message.success(`${info.file.name} 文件上传成功`);
+          if (info.file.response.code === 201) {
+            let { message, result: { msg, fileUrl, fileName } } = info.file.response
+            let href = window._CONFIG['domianURL'] + fileUrl
+            this.$warning({
+              title: message,
+              content: (<div>
+                  <span>{msg}</span><br/>
+                  <span>具体详情请 <a href={href} target="_blank" download={fileName}>点击下载</a> </span>
+                </div>
+              )
+            })
+          } else {
+            this.$message.success(info.file.response.message || `${info.file.name} 文件上传成功`)
+          }
+          this.loadData()
+        } else {
+          this.$message.error(`${info.file.name} ${info.file.response.message}.`);
+        }
+      } else if (info.file.status === 'error') {
+        if (info.file.response.status === 500) {
+          let data = info.file.response
+          const token = Vue.ls.get(ACCESS_TOKEN)
+          if (token && data.message.includes("Token失效")) {
+            Modal.error({
               title: '登录已过期',
               content: '很抱歉，登录已过期，请重新登录',
               okText: '重新登录',
@@ -369,6 +512,40 @@ export const JeecgListMixin = {
       let url = getFileAccessHttpUrl(text)
       window.open(url);
     },
-  }
+    /**
+     * 获取当前时间 格式：yyyy-MM-dd HH:MM:SS
+     */
+    getCurrentTime() {
+        var date = new Date();//当前时间
+          var month = this.zeroFill(date.getMonth() + 1);//月
+          var day = this.zeroFill(date.getDate());//日
+          var hour = this.zeroFill(date.getHours());//时
+          var minute = this.zeroFill(date.getMinutes());//分
+          var second = this.zeroFill(date.getSeconds());//秒
+
+          //当前时间
+          var curTime = date.getFullYear() + "-" + month + "-" + day
+            + " " + hour + ":" + minute + ":" + second;
+
+          return curTime;
+    },
+
+    /**
+     * 补零
+     */
+     zeroFill(i){
+          if (i >= 0 && i <= 9) {
+            return "0" + i;
+          } else {
+            return i;
+          }
+        },
+    /** tab切换时取消选择*/
+    changTab:function(){
+      this.searchQuery();
+      this.selectedRowKeys=[];
+    },
+      },
+
 
 }

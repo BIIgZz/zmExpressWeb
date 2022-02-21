@@ -27,6 +27,15 @@
         <a style="margin-left: 24px" @click="onClearSelected">清空</a>
       </div>
 
+      <a-tabs default-active-key="0"  @change='tabClick' type='card'>
+        <a-tab-pane :label="item" :name="item" v-for="(item, index) in sortNum" :key="index">
+          <template slot="tab">
+            <p>{{item}}</p>
+          </template>
+        </a-tab-pane>
+      </a-tabs>
+
+
       <a-table
         ref="table"
         size="middle"
@@ -84,7 +93,7 @@
       :title="title"
       placement="right"
       :closable="false"
-      :width="900"
+      :width="1200"
       :visible="visible"
       :after-visible-change="afterVisibleChange"
       @close="onClose"
@@ -100,6 +109,10 @@
         <a-tab-pane tab="财务数据" key="3" forceRender>
           <ZmClientFinanceList :mainId="selectedMainId" />
         </a-tab-pane>
+        <a-tab-pane tab="认证资料" key="4" forceRender>
+          <ZmClientIdentity :mainId="userId" @sortNum="getSortNum"/>
+        </a-tab-pane>
+
       </a-tabs>
 
     </a-drawer>
@@ -117,7 +130,9 @@
   import ZmClientBasicList from './ZmClientBasicList'
   import ZmClientAddressList from './ZmClientAddressList'
   import ZmClientFinanceList from './ZmClientFinanceList'
+  import ZmClientIdentity from './ZmClientIdentity'
   import '@/assets/less/TableExpand.less'
+  import { handleDetailss } from '../../../api/manage'
 
   export default {
     name: "ZmClientMainList",
@@ -126,12 +141,15 @@
       ZmClientBasicList,
       ZmClientAddressList,
       ZmClientFinanceList,
-      ZmClientMainModal
+      ZmClientMainModal,
+      ZmClientIdentity,
+
     },
     data () {
       return {
         visible: false,
         description: '用户主表管理页面',
+        disableMixinCreated:true,
         // 表头
         columns: [
           {
@@ -177,13 +195,16 @@
           showSizeChanger: true,
           total: 0
         },
+        userId:'',
         selectedMainId:'',
         superFieldList:[],
-        title:''
+        title:'',
+        sortNum:[],
       }
     },
     created() {
-      this.getSuperFieldList();
+      this.tabClick(0);
+      this.getSortNum();
     },
     computed: {
       importExcelUrl: function(){
@@ -199,9 +220,30 @@
             click: () => {
               this.onSelectChange(record.id.split(","), [record]);
               this.title=record.code+"/"+record.username;
+              this.userId = record.code;
             }
           }
         }
+      },
+      /** 分类统计*/
+      async getSortNum(){
+        var list = '/zmexpress/zmClientMain/statisticsByStatus'
+        var that = this;
+
+        this.sortNum =await handleDetailss(list, "").then(res => {
+          if (res.success) {
+            that.reCalculatePage(that.selectedRowKeys.length)
+            return res.result;
+          }
+        })
+      },
+      tabClick(val){
+
+        if (val!=5)
+         this.queryParam.status=val;
+        else
+          this.queryParam.status='';
+        this.loadData(1);
       },
       cellClick(record) {
         return {
@@ -245,6 +287,8 @@
         }
         this.onClearSelected()
         var params = this.getQueryParams();//查询条件
+        console.log("status",this.queryParam.status);
+        console.log("param",params)
         this.loading = true;
         getAction(this.url.list, params).then((res) => {
           if (res.success) {
