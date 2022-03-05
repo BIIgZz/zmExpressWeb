@@ -89,11 +89,12 @@
           <a-col :span="8">
             <a-collapse default-active-key="3" :bordered="false">
               <a-collapse-panel key="3" header="路由信息">
-              <a-timeline  mode="alternate" >
+              <a-timeline  >
                 <a-timeline-item v-for="(item,index) in  logDetail"  :key='index'>
                   <a-icon slot="dot" type="down-circle" style="font-size: 16px;"  @click='deleteMsg(item.id)'/>
                   {{ item.msg }}
-                  <label v-if='item.remark!=""'><br/>备注：{{item.remark}}</label>
+
+                  <label v-if='!isEmpty(item.remark)'><br/>备注：{{item.remark}}</label>
                   <br/>{{ item.createTime }}
                 </a-timeline-item>
 
@@ -842,7 +843,7 @@
       },
 
       async getLogDetails(){
-        let params = this.myProp.orderId;
+        let params = this.myProp.id;
         this.logDetail =await handleDetailss( '/zmexpress/zmLogisticsInformation/queryByWaybillId', {waybillId: params}).then(res => {
           if (res.success) {
             return res.result;
