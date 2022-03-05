@@ -770,7 +770,7 @@
   import '@/assets/less/TableExpand.less'
   import  Vue  from 'vue'
   import JCodeEditor from './../../../components/jeecg/JCodeEditor'
-  import { getAction, handleDetailss, putAction,uploadAction } from '../../../api/manage'
+  import { deleteAction, getAction, handleDetailss, putAction, uploadAction } from '../../../api/manage'
   import {mapGetters} from 'vuex'
 
 
@@ -1661,7 +1661,44 @@
           });
         }
       },
-
+      batchDel: function () {
+        if(!this.url.deleteBatch){
+          this.$message.error("请设置url.deleteBatch属性!")
+          return
+        }
+        if (this.selectedRowKeys.length <= 0) {
+          this.$message.warning('请选择一条记录！');
+          return;
+        } else {
+          var ids = "";
+          for (var a = 0; a < this.selectedRowKeys.length; a++) {
+            ids += this.selectedRowKeys[a] + ",";
+            console.log(ids);
+          }
+          var that = this;
+          this.$confirm({
+            title: "确认删除",
+            content: "是否删除选中数据?",
+            onOk: function () {
+              that.loading = true;
+              deleteAction(that.url.deleteBatch, {ids: ids}).then((res) => {
+                if (res.success) {
+                  //重新计算分页问题
+                  this.getSortNum();
+                  that.reCalculatePage(that.selectedRowKeys.length)
+                  that.$message.success(res.message);
+                  that.loadData();
+                  that.onClearSelected();
+                } else {
+                  that.$message.warning(res.message);
+                }
+              }).finally(() => {
+                that.loading = false;
+              });
+            }
+          });
+        }
+      },
       handleExpand(expanded, record) {
         this.expandedRowKeys = []
         if (expanded === true) {
