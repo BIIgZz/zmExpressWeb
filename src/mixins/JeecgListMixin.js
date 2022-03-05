@@ -530,21 +530,43 @@ export const JeecgListMixin = {
           return curTime;
     },
 
-    /**
-     * 补零
-     */
-     zeroFill(i){
-          if (i >= 0 && i <= 9) {
-            return "0" + i;
-          } else {
-            return i;
+          /**
+           * 补零
+           */
+           zeroFill(i){
+                if (i >= 0 && i <= 9) {
+                  return "0" + i;
+                } else {
+                  return i;
+                }
+              },
+          /** tab切换时取消选择*/
+          changTab:function(){
+            this.searchQuery();
+            this.selectedRowKeys=[];
+          },
+         isEmpty:function(v) {
+            switch (typeof v) {
+              case 'undefined':
+                return true;
+              case 'string':
+                if (v.replace(/(^[ \t\n\r]*)|([ \t\n\r]*$)/g, '').length == 0) return true;
+                break;
+              case 'boolean':
+                if (!v) return true;
+                break;
+              case 'number':
+                if (0 === v || isNaN(v)) return true;
+                break;
+              case 'object':
+                if (null === v || v.length === 0) return true;
+                for (var i in v) {
+                  return false;
+                }
+                return true;
+            }
+            return false;
           }
-        },
-    /** tab切换时取消选择*/
-    changTab:function(){
-      this.searchQuery();
-      this.selectedRowKeys=[];
-    },
       },
 
 
