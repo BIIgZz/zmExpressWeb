@@ -676,10 +676,10 @@
           </a-row>
 
           <a-form-model-item>
-            <a-button type="primary" style='margin-right: 5px '  @click="edit" v-if='formData.status==0'>保存修改</a-button>
-            <a-button type="primary"  style='margin-right: 5px ' @click="pass" v-if='formData.status==0'>通过</a-button>
-            <a-button type="danger"  @click="edit" v-if='formData.status==0'>拒绝</a-button>
-            <a-button type="danger"  @click="passOut" v-if='formData.status==1'>审核驳回</a-button>
+            <a-button type="primary" style='margin-right: 5px '  @click="edit" v-if="formData.status=='1'">保存修改</a-button>
+            <a-button type="primary"  style='margin-right: 5px ' @click="pass" v-if="formData.status=='1'||formData.status=='3'">通过</a-button>
+            <a-button type="danger"  @click="edit" v-if='formData.status==1'>拒绝</a-button>
+            <a-button type="danger"  @click="passOut" v-if='formData.status==4'>审核驳回</a-button>
             <!--            <a-button style="margin-left: 8px">保存</a-button>-->
           </a-form-model-item>
         </a-form-model>
@@ -755,7 +755,8 @@ export default {
         fixedBox: true,
         // 开启宽度和高度比例
         fixed: true,
-        fixedNumber: [1, 1]
+        fixedNumber: [1, 1],
+        status:0,
       },
       formData:{
         type:'',
@@ -777,7 +778,7 @@ export default {
     }
   },
   created() {
-
+      this.getDetails();
   },
   methods: {
     ...mapGetters(["nickname", "avatar","userInfo","userIdentity"]),
@@ -791,7 +792,6 @@ export default {
       });
     },
     onSubmit() {
-      console.log("提交")
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
           postAction("/zmexpress/zmUserDetail/add", this.formData).then((res) => {
@@ -898,11 +898,18 @@ export default {
       let data;
       data =await handleDetailss( '/zmexpress/zmUserDetail/queryByUserCode', {userCode: this.mainId}).then(res => {
         if (res.success) {
+          console.log("res",res.result)
           return res.result;
         }
       });
-      if (data!=null)
+
+      if (data!=null){
         this.formData = data;
+        this.status = data.status;
+        console.log("formData",data);
+        console.log("status",this.status);
+      }
+
 
     },
     // 校验手机号

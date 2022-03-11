@@ -75,7 +75,7 @@
             <a-divider/>
             <a-row :gutter="24">
               <a-col :span="12">
-                <lable>中文地址</lable>
+                <label name='中文地址'>中文地址</label>
                 <a-divider />
                 <a-form-model-item
                   label="联系人"
@@ -382,7 +382,7 @@
 
 
               <a-col :span="12">
-                <lable>英文地址</lable>
+                <label >英文地址</label>
                 <a-divider />
                 <a-form-model-item
                   label="联系人"
@@ -688,8 +688,9 @@
             </a-row>
 
             <a-form-model-item>
-              <a-button type="primary"  @click="onSubmit" v-if="formData.status==''">提交</a-button>
-              <a-button type="primary"  @click="edit" v-if='formData.status==0'>修改</a-button>
+              <a-button type="primary"  @click="onSubmit" v-if="identity=='0'">提交</a-button>
+
+              <a-button type="primary"  @click="edit" v-if=' formData.status=="1"||formData.status=="3"'>修改并重新提交</a-button>
               <!--            <a-button style="margin-left: 8px">保存</a-button>-->
             </a-form-model-item>
           </a-form-model>
@@ -774,6 +775,7 @@
           status:'',
         },
         formDisabled:false,
+        identity:0,
       }
     },
 
@@ -782,6 +784,7 @@
     },
     created() {
       this.getDetails();
+
     },
     methods: {
       ...mapGetters(["nickname", "avatar","userInfo","userIdentity"]),
@@ -795,12 +798,12 @@
         });
       },
       onSubmit() {
-        console.log("提交")
         this.$refs.ruleForm.validate(valid => {
           if (valid) {
             this.formData.userId=this.userInfo().clientId;
             postAction("/zmexpress/zmUserDetail/add", this.formData).then((res) => {
               if(res.success){
+                this.identity=1;
                 if(res.code == 201){
                   this.errorTip(res.message, res.result)
                 }else{
@@ -816,9 +819,9 @@
             return false;
           }
         });
+        this.getDetails();
       },
       edit() {
-        console.log("提交")
         this.$refs.ruleForm.validate(valid => {
           if (valid) {
             putAction("/zmexpress/zmUserDetail/edit", this.formData).then((res) => {
@@ -865,9 +868,15 @@
         });
         if (data!=null)
           this.formData = data;
-        if (data.status==1){
+        if (data.status==4){
           this.formDisabled=true
         }
+        if (!this.isEmpty(this.formData.status)){
+          this.identity = this.formData.status;
+        }else {
+          this.identity=1;
+        }
+        console.log("identity",this.identity)
       },
       // 校验手机号
       validateMobile(rule,value,callback){
@@ -877,7 +886,29 @@
           callback("您的手机号码格式不正确!");
         }
       },
-    }
+      isEmpty:function(v) {
+        switch (typeof v) {
+          case 'undefined':
+            return true;
+          case 'string':
+            if (v.replace(/(^[ \t\n\r]*)|([ \t\n\r]*$)/g, '').length == 0) return true;
+            break;
+          case 'boolean':
+            if (!v) return true;
+            break;
+          case 'number':
+            if (0 === v || isNaN(v)) return true;
+            break;
+          case 'object':
+            if (null === v || v.length === 0) return true;
+            for (var i in v) {
+              return false;
+            }
+            return true;
+        }
+        return false;
+      }
+  }
   }
 </script>
 

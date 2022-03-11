@@ -10,13 +10,13 @@
  * contentWidth - 内容区布局： 流式 |  固定
  *
  * storageOptions: {} - Vue-ls 插件配置项 (localStorage/sessionStorage)
- *
+ *配置栏只在开发环境用于预览，生产环境不会展现，请手动修改配置文件
  */
 
 export default {
   primaryColor: '#1890FF', // primary color of ant design
   navTheme: 'light', // theme for nav menu
-  layout: 'sidemenu', // nav menu position: sidemenu or topmenu
+  layout: 'topmenu', // nav menu position: sidemenu or topmenu
   contentWidth: 'Fixed', // layout of content: Fluid or Fixed, only works when layout is topmenu
   fixedHeader: false, // sticky header
   fixSiderbar: false, // sticky siderbar

@@ -3,7 +3,7 @@
 
 <div>
 
-  <a-card class="j-inner-table-wrapper" :bordered="false" v-show="identity!='0'" >
+  <a-card  :bordered="false" v-show="identity!='0'&&identity!='3'" >
 
     <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
@@ -180,9 +180,9 @@
       <div class="table-page-search-wrapper">
         <template>
           <div>
-            <a-tabs default-active-key="已下单"  type="card" @change="tabClick">
+            <a-tabs :default-active-key="defaultActiveKey"  type="card" @change="tabClick">
 
-              <a-tab-pane key="已下单"       >
+              <a-tab-pane key="已下单" >
                 <template slot="tab">
                   <p>{{ sortNum[0] }}</p>
                 </template>
@@ -746,18 +746,8 @@
     <zm-waybills-modal ref="modalForm" @ok="modalFormOk"/>
 
   </a-card>
-<!--  <a-alert-->
-<!--    message="信息提示"-->
-<!--    description="请在个人信息页提交认证资料"-->
-<!--    type="info"-->
-<!--    v-if='identity==0'-->
-<!--    show-icon-->
-<!--  />-->
+
 </div>
-
-
-
-
 </template>
 
 <script>
@@ -1099,7 +1089,7 @@
         dictOptions: {},
         // 展开的行test
         expandedRowKeys: [],
-        identity : "",
+        identity : "0",
         url: {
           list: '/zmexpress/zmWaybills/list',
           delete: '/zmexpress/zmWaybills/delete',
@@ -1117,12 +1107,19 @@
       }
     },
     created() {
-      this.getUserInfo(this.userInfo().id);
-      this.tabClick("已下单");
-      this.initColumns();
-      if(this.$route.query.id!=null){
+      this.getStatus();
+      if (!this.isEmpty(this.$route.query.status)){
+        this.defaultActiveKey = this.$route.query.status;
+        this.queryParam.status = this.$route.query.status;
+        this.loadData(1);
+      }
+
+      if(!this.isEmpty(this.$route.query.id)){
          this.queryParam.waybillId = this.$route.query.id;
       }
+      this.initColumns();
+
+      // this.tabClick("已下单");
       this.getSortNum();
 
       // this.getSuperFieldList();
@@ -1150,24 +1147,7 @@
         this.queryParam.status=val;
         this.loadData(1);
       },
-      /**
-       * 获取用户信息
-       */
-      async getUserInfo(id) {
-        var list = '/sys/user/queryById'
-        this.userInfos =await handleDetailss(list, { id:id }).then(res => {
-          if (res.success) {
-            return res.result;
-          }
-        })
-        this.identity = this.userInfos.userIdentity;
-        if (this.identity==0){
-          this.$message.warning(
-            '请在个人信息页提交认证资料',
-            5,
-          );
-        }
-      },
+
       showAddToBill(){
         if (this.selectedRowKeys.length <= 0) {
           this.$message.warning('请选择一条记录！');
@@ -1198,13 +1178,11 @@
         this.getSortNum()
         this.loadData(1)
       },
-
       showModal() {
         this.visibleImport = true;
       },
       handleRemove(file) {
         //  移除文件
-
         this.$message.warning(`移除当前${file.name}运单，请重新选择运单上传！`);
         const index = this.fileList.indexOf(file);
         const newFileList = this.fileList.slice();
@@ -1219,35 +1197,7 @@
         e.preventDefault();
         this.form.validateFields((err, values) => {
           if (!err) {
-            // console.log('Received values of form: ', values);
-            // this.handleImportExcelAndForm(values);
-            //
-            // JSON.stringify(values);
-            // const formData = new FormData();
-            // values.file.forEach(file => {
-            //   formData.append('files[]', file);
-            // });
-            // formData.append("name",values.name)
             this.uploading = true;
-
-            console.log(values)
-            // You can use any AJAX library you like
-
-            // reqwest({
-            //   url: this.importForm,
-            //   method: 'post',
-            //   processData: false,
-            //   data: formData,
-            //   success: () => {
-            //     this.fileList = [];
-            //     this.uploading = false;
-            //     this.$message.success('upload successfully.');
-            //   },
-            //   error: () => {
-            //     this.uploading = false;
-            //     this.$message.error('upload failed.');
-            //   },
-            // });
           }
         });
       },
@@ -1370,14 +1320,12 @@
           }).finally(() => {
             that.loading = false;
           });
-
       },
       /** 分类统计*/
       async getSortNum(){
         var list = '/zmexpress/zmWaybills/statisticsByStatus'
         var that = this;
-
-        this.sortNum =await handleDetailss(list, "").then(res => {
+        this.sortNum =await handleDetailss(list, {type:this.userInfo().userIdentity,name:this.userInfo().username}).then(res => {
           if (res.success) {
             that.reCalculatePage(that.selectedRowKeys.length)
             return res.result;
@@ -1660,6 +1608,31 @@
             }
           });
         }
+      },
+      async getStatus(){
+        let params = this.userInfo().clientId;
+        var data =await handleDetailss( '/zmexpress/zmUserDetail/queryByUserCode', {userCode: params}).then(res => {
+          if (res.success) {
+            return res.result;
+          }
+        });
+        if (this.isEmpty(data.status)){
+          this.identity = this.userInfo().userIdentity;
+        }else{
+          this.identity = data.status;
+        }
+        if (this.identity=="0"){
+          this.$message.warning(
+            '请在个人信息页提交认证资料',
+            5,
+          );
+        }else if (this.identity=="3"){
+          this.$message.warning(
+            '请在个人信息页重新提交完善后的认证资料',
+            5,
+          );
+        }
+      console.log("identity",this.identity)
       },
       batchDel: function () {
         if(!this.url.deleteBatch){
