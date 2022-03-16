@@ -90,6 +90,15 @@
         },
         confirmLoading: false,
         validatorRules: {
+          name: [
+            { required: true, message: '请输入地点名称!'},
+          ],
+          type: [
+            { required: true, message: '请选择类型!'},
+          ],
+          country: [
+              { required: true, message: '请输入国家!'},
+            ],
         },
         url: {
           add: "/zmexpress/zmAirport/add",

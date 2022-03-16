@@ -4,6 +4,11 @@
       <a-form-model ref="form" :model="model" :rules="validatorRules" slot="detail">
         <a-row>
           <a-col :span="12">
+            <a-form-model-item label="发出站点" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="departure">
+              <j-search-select-tag v-model="model.departure" dict="zm_airport,name,name"  />
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="12">
             <a-form-model-item label="发往站点" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="destination">
               <j-search-select-tag v-model="model.destination" dict="zm_airport,name,name"  />
             </a-form-model-item>
@@ -15,17 +20,12 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="船公司" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="supplier">
-              <j-dict-select-tag type="list" v-model="model.supplier" dictCode="zm_supplier,company,company" placeholder="请选择供应商" />
+              <j-search-select-tag type="list" v-model="model.supplier" dict="zm_shipping_company,name,name" placeholder="请选择船公司" />
             </a-form-model-item>
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="出货时间" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="pickingTime">
               <j-date placeholder="请选择出货时间"  v-model="model.pickingTime" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
-            </a-form-model-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-model-item label="发出站点" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="departure">
-              <j-search-select-tag v-model="model.departure" dict="zm_airport,name,name"  />
             </a-form-model-item>
           </a-col>
           <a-col :span="12">
@@ -80,6 +80,18 @@
         },
         confirmLoading: false,
         validatorRules: {
+          destination: [
+            { required: true, message: '请输入发往站点!'},
+          ],
+          // mainName: [
+          //   { required: true, message: '请输入主品名!'},
+          // ],
+          supplier: [
+            { required: true, message: '请输入船公司!'},
+          ],
+          departure: [
+            { required: true, message: '请输入发出站点!'},
+          ],
         },
         url: {
           add: "/zmexpress/zmDeliveryOrder/add",

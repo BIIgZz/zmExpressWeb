@@ -13,7 +13,11 @@
               <a-input v-model="model.enName" placeholder="请输入站点名称(英)"  ></a-input>
             </a-form-model-item>
           </a-col>
-
+          <a-col :span="12">
+            <a-form-model-item label="区域" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="stationArea">
+              <j-search-select-tag v-model="model.stationArea" placeholder="请选择区域"  dict="zm_area_receiving,area_name,area_name" />
+            </a-form-model-item>
+          </a-col>
           <a-col :span="12">
             <a-form-model-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="stationStatus">
               <j-dict-select-tag type="list" v-model="model.stationStatus" dictCode="status" placeholder="请选择状态" />

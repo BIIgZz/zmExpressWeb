@@ -60,6 +60,12 @@
         },
         confirmLoading: false,
         validatorRules: {
+          name: [
+            { required: true, message: '请输入中文名称!'},
+          ],
+          abbreviation: [
+            { required: true, message: '请输入简称!'},
+          ],
         },
         url: {
           add: "/zmexpress/zmShippingCompany/add",

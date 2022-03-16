@@ -29,6 +29,21 @@
             </a-form-model-item>
           </a-col>
           <a-col :span="12">
+            <a-form-model-item label="航次" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="shift">
+              <a-input v-model="model.shift" placeholder="请输入班次"  ></a-input>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-model-item label="船名" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="shipNumber">
+              <a-input v-model="model.shipNumber" placeholder="请输入船号"  ></a-input>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-model-item label="集装箱规格" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="container">
+              <j-dict-select-tag type="list" v-model="model.container" dictCode="zm_container_standards,standard,standard" placeholder="请选择集装箱规格" />
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="12">
             <a-form-model-item label="清关公司" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="customsClearance">
               <j-search-select-tag v-model="model.customsClearance" dict="zm_supplier where type like '%7%' ,company,company"  />
             </a-form-model-item>
@@ -123,21 +138,8 @@
               <j-date placeholder="请选择清关时间"  v-model="model.customsClearanceTime" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
             </a-form-model-item>
           </a-col>
-          <a-col :span="12">
-            <a-form-model-item label="集装箱规格" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="container">
-              <j-dict-select-tag type="list" v-model="model.container" dictCode="zm_container_standards,standard,standard" placeholder="请选择集装箱规格" />
-            </a-form-model-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-model-item label="航次" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="shift">
-              <a-input v-model="model.shift" placeholder="请输入班次"  ></a-input>
-            </a-form-model-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-model-item label="船名" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="shipNumber">
-              <a-input v-model="model.shipNumber" placeholder="请输入船号"  ></a-input>
-            </a-form-model-item>
-          </a-col>
+
+
         </a-row>
       </a-form-model>
     </j-form-container>
@@ -175,6 +177,25 @@ export default {
       },
       confirmLoading: false,
       validatorRules: {
+        billnum: [
+          { required: true, message: '请输入柜号!'},
+        ],
+        inBillnum: [
+          { required: true, message: '请输入提单号!'},
+        ],
+        type: [
+          { required: true, message: '请输入类型!'},
+        ],
+        arriage: [
+          { required: true, message: '请输入船公司!'},
+        ],
+
+        departurePoint: [
+          { required: true, message: '请输入发出站点!'},
+        ],
+        sendSite: [
+          { required: true, message: '请输入发往站点!'},
+        ],
       },
       url: {
         add: "/zmexpress/zmBillloading/add",

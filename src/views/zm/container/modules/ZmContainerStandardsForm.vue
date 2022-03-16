@@ -3,22 +3,22 @@
     <j-form-container :disabled="formDisabled">
       <a-form-model ref="form" :model="model" :rules="validatorRules" slot="detail">
         <a-row>
-          <a-col :span="6">
+          <a-col :span="12">
             <a-form-model-item label="规格" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="standard">
               <a-input v-model="model.standard" placeholder="请输入规格"  ></a-input>
             </a-form-model-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :span="12">
             <a-form-model-item label="长×宽×高(米)" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="size">
               <a-input v-model="model.size" placeholder="请输入长×宽×高(米)"  ></a-input>
             </a-form-model-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :span="12">
             <a-form-model-item label="配货毛重(吨)" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="weight">
               <a-input v-model="model.weight" placeholder="请输入配货毛重(吨)"  ></a-input>
             </a-form-model-item>
           </a-col>
-          <a-col :span="6">
+          <a-col :span="12">
             <a-form-model-item label="体积(m3)" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="volume">
               <a-input v-model="model.volume" placeholder="请输入体积(m3)"  ></a-input>
             </a-form-model-item>
@@ -60,6 +60,16 @@
         },
         confirmLoading: false,
         validatorRules: {
+          standard: [
+            { required: true, message: '请输入规格!'},
+          ],
+          size: [
+            { required: true, message: '请输入长*宽*高!'},
+          ],
+          weight: [
+            { required: true, message: '请输入配货毛重(吨)!'},
+          ],
+
         },
         url: {
           add: "/zmexpress/zmContainerStandards/add",

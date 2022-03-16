@@ -32,6 +32,7 @@
         this.$nextTick(()=>{
           this.$refs.realForm.add();
         })
+
       },
       edit (record) {
         this.visible=true
@@ -39,6 +40,7 @@
           this.$refs.realForm.edit(record);
         })
       },
+
       close () {
         this.$emit('close');
         this.visible = false;

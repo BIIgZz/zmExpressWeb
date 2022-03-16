@@ -76,10 +76,13 @@
         },
         confirmLoading: false,
         validatorRules: {
-           tel: [
-              { required: false},
-              { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号码!'},
-           ],
+          tel: [
+            { required: true,message: '请输入联系电话'},
+            { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号码!'},
+          ],
+          linkman: [
+            { required: true, message: '请输入联系人!'},
+          ],
         },
         url: {
           add: "/zmexpress/zmSupplier/add",

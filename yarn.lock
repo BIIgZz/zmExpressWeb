@@ -895,7 +895,7 @@
 
 "@jeecg/antd-online-mini@3.0.0-RC":
   version "3.0.0-RC"
-  resolved "https://registry.npmjs.org/@jeecg/antd-online-mini/-/antd-online-mini-3.0.0-RC.tgz#8b220234d39bfcd9b8b1ce2c78ca1bd92b86da0b"
+  resolved "https://registry.yarnpkg.com/@jeecg/antd-online-mini/-/antd-online-mini-3.0.0-RC.tgz#8b220234d39bfcd9b8b1ce2c78ca1bd92b86da0b"
   integrity sha512-oNYRPsnlKUPpJKJvQSaqgX6XenDPKwFLHcLYFdrmEYnSCGU46x1p/coqea9r8lI6s1Y2Az0+xAOdwOMPnu/AtQ==
 
 "@jspreadsheet/formula@^1.1.0", "@jspreadsheet/formula@^1.2.0":

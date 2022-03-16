@@ -66,6 +66,15 @@
         },
         confirmLoading: false,
         validatorRules: {
+          areaCode: [
+            { required: true, message: '请输入区域编码!'},
+          ],
+          areaName: [
+            { required: true, message: '请输入区域名称!'},
+          ],
+          areaType: [
+            { required: true, message: '请选择区域类型!'},
+          ],
         },
         url: {
           add: "/zmexpress/zmAreaReceiving/add",

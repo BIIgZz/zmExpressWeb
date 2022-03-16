@@ -1,7 +1,7 @@
 <template>
    <a-spin :spinning="confirmLoading">
      <div >
-       <a-row >
+       <a-row v-if='this.userInfo().userIdentity!=4' >
          <a-col  :span="8">
            <a-form-model-item label="客户名称"  :labelCol="labelCol" :wrapperCol="wrapperCol"  prop="name">
              <j-dict-select-tag type="list"  style="width:280px;"  v-model="model.username" dictCode="zm_client_main,username,username" placeholder="请选择客户名称" />
@@ -263,6 +263,7 @@
   import { validateDuplicateValue } from '@/utils/util'
   const ruleBaseURL = '/sys/fillRule/executeRuleByCode/'
   import { putAction } from '@api/manage'
+  import { mapGetters } from 'vuex'
   export default {
     name: 'ZmWaybillsForm',
     mixins: [JEditableTableModelMixin],
@@ -289,6 +290,24 @@
         model:{
         },
         validatorRules: {
+          waybillId: [
+            { required: true, message: '请输入运单号!'},
+          ],
+          caseId: [
+            { required: true, message: '请输入柜号!'},
+          ],
+          service: [
+            { required: true, message: '请输入服务!'},
+          ],
+          customsDeclaration: [
+            { required: true, message: '请输入报关方式!'},
+          ],
+          customsClearance: [
+            { required: true, message: '请输入清关方式!'},
+          ],
+          taxPayment: [
+            { required: true, message: '请输入交税方式!'},
+          ],
         },
         // 新增时子表默认添加几行空数据
         addDefaultRowNum: 1,
@@ -514,8 +533,12 @@
     },
     created () {
       this.getOrderNum();
+      if(this.userInfo().userIdentity==4){
+        this.model.username = this.userInfo().username
+      }
     },
     methods: {
+      ...mapGetters(["nickname", "avatar","userInfo"]),
      addBefore(){
             this.zmGoodCaseTable.dataSource=[]
       },
@@ -542,7 +565,6 @@
         putAction(this.url.rule.orderNo, this.model).then(res => {
           // 执行成功，获取返回的值，并赋到页面上
           if (res.success) {
-            console.log(res);
             if( this.model.orderId == null)
               this.model.orderId = res.result
           }

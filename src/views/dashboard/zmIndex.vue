@@ -3,7 +3,7 @@
     <div v-show='identity==2||identity==1' class="page-header-index-wide">
       <a-row :gutter="24">
         <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-          <chart-card :loading="loading" title="总运单额" :total='totalWaybills'>
+          <chart-card :loading="loading" title="总运单额" :total="totalWaybills">
             <a-tooltip title="系统总运单量" slot="action" >
               <a-icon type="info-circle-o" />
             </a-tooltip>
@@ -21,7 +21,7 @@
           </chart-card>
         </a-col>
         <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-          <chart-card :loading="loading" title="总提单数" :total='totalBill'>
+          <chart-card :loading="loading" title="总提单数" :total=totalBill>
             <a-tooltip title="指标说明" slot="action">
               <a-icon type="info-circle-o" />
             </a-tooltip>
@@ -286,8 +286,8 @@
         visitInfo:[],
         indicator: <a-icon type="loading" style="font-size: 24px" spin />,
         identity:0,
-        totalWaybills:0,
-        totalBill:0,
+        totalWaybills:"0",
+        totalBill:"0",
         userStatics:{"ordered":0,"received":0,"transit":0,"sign":0,"return":0,"cancel":0},
       }
     },
@@ -295,7 +295,6 @@
       this.getStatus();
       this.initLogInfo();
       this.getTotalWaybills();
-      this.getUserInfo();
       this.getStatics();
     },
     methods: {
@@ -307,15 +306,13 @@
             return res.result;
           }
         })
+        this.totalWaybills=this.totalWaybills.toString();
         this.totalBill =await getAction("/zmexpress/zmBillloading/getTotalBill",{}).then(res => {
           if (res.success) {
             return res.result;
           }
         })
-      },
-      getUserInfo(){
-
-
+        this.totalBill = this.totalBill.toString();
       },
       async getStatics(){
         this.userStatics =await getAction("/zmexpress/zmWaybills/getSortNum",{name:this.userInfo().username}).then(res => {
@@ -344,16 +341,19 @@
       },
       async getStatus(){
         let params = this.userInfo().clientId;
-        var data =await handleDetailss( '/zmexpress/zmUserDetail/queryByUserCode', {userCode: params}).then(res => {
-          if (res.success) {
-            return res.result;
-          }
-        });
-        if (!this.isEmpty(data.status))
-           this.identity = data.status;
-        else{
+        var data;
+        if (this.isEmpty(params)){
           this.identity = this.userInfo().userIdentity;
+        } else{
+          data=await handleDetailss( '/zmexpress/zmUserDetail/queryByUserCode', {userCode: params}).then(res => {
+            if (res.success) {
+              return res.result;
+            }
+          });
         }
+
+        if (!this.isEmpty(data))
+           this.identity = data.status;
       },
       isEmpty:function(v) {
         switch (typeof v) {
