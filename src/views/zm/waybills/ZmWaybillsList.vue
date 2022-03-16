@@ -120,7 +120,7 @@
 
     <!-- 操作按钮区域 begin -->
     <div class="table-operator">
-      <a-button type="primary" icon="plus" @click="handleAdd">新增</a-button>
+      <a-button type="primary" icon="plus" @click="handleAdd" >新增</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('运单')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
@@ -1112,6 +1112,9 @@
         this.defaultActiveKey = this.$route.query.status;
         this.queryParam.status = this.$route.query.status;
         this.loadData(1);
+      }else{
+        this.queryParam.status = "已下单";
+        this.loadData(1);
       }
 
       if(!this.isEmpty(this.$route.query.id)){
@@ -1135,6 +1138,13 @@
     methods: {
       ...mapGetters(["nickname", "avatar","userInfo","userIdentity"]),
       afterVisibleChange(val) {
+      },
+      modalFormOk() {
+        this.getSortNum()
+        // 新增/修改 成功时，重载列表
+        this.loadData();
+        //清空列表选中
+        this.onClearSelected()
       },
       showDrawer() {
         this.visible = true;
@@ -1611,16 +1621,18 @@
       },
       async getStatus(){
         let params = this.userInfo().clientId;
-        var data =await handleDetailss( '/zmexpress/zmUserDetail/queryByUserCode', {userCode: params}).then(res => {
-          if (res.success) {
-            return res.result;
-          }
-        });
-        if (this.isEmpty(data.status)){
+        var data;
+        if (this.isEmpty(params)){
           this.identity = this.userInfo().userIdentity;
-        }else{
-          this.identity = data.status;
+        } else{
+          data=await handleDetailss( '/zmexpress/zmUserDetail/queryByUserCode', {userCode: params}).then(res => {
+            if (res.success) {
+              return res.result;
+            }
+          });
         }
+        if (!this.isEmpty(data))
+          this.identity = data.status;
         if (this.identity=="0"){
           this.$message.warning(
             '请在个人信息页提交认证资料',
@@ -1632,7 +1644,6 @@
             5,
           );
         }
-      console.log("identity",this.identity)
       },
       batchDel: function () {
         if(!this.url.deleteBatch){
@@ -1646,7 +1657,6 @@
           var ids = "";
           for (var a = 0; a < this.selectedRowKeys.length; a++) {
             ids += this.selectedRowKeys[a] + ",";
-            console.log(ids);
           }
           var that = this;
           this.$confirm({
@@ -1657,7 +1667,7 @@
               deleteAction(that.url.deleteBatch, {ids: ids}).then((res) => {
                 if (res.success) {
                   //重新计算分页问题
-                  this.getSortNum();
+                  that.getSortNum();
                   that.reCalculatePage(that.selectedRowKeys.length)
                   that.$message.success(res.message);
                   that.loadData();
