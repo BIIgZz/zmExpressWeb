@@ -8,8 +8,8 @@ import router from './router'
 import store from './store/'
 import { VueAxios } from "@/utils/request"
 
-require('@jeecg/antd-online-mini')
-require('@jeecg/antd-online-mini/dist/OnlineForm.css')
+// require('@jeecg/antd-online-mini')
+// require('@jeecg/antd-online-mini/dist/OnlineForm.css')
 
 import Antd, { version } from 'ant-design-vue'
 console.log('ant-design-vue version:', version)
@@ -45,8 +45,8 @@ import vueBus from '@/utils/vueBus';
 import JeecgComponents from '@/components/jeecg/index'
 import '@/assets/less/JAreaLinkage.less'
 import VueAreaLinkage from 'vue-area-linkage'
-import '@/components/jeecg/JVxeTable/install'
-import '@/components/JVxeCells/install'
+// import '@/components/jeecg/JVxeTable/install'
+// import '@/components/JVxeCells/install'
 //表单验证
 import { rules } from '@/utils/rules'
 Vue.prototype.rules = rules
